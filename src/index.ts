@@ -8,15 +8,22 @@ export const makeBrowserManager = async (
   browserAdapter: BrowserAdapter,
   options: { onExit?: () => void } = {}
 ) => {
+  await browserAdapter.launch({
+    onExit: () => options.onExit?.(),
+  });
+
   const browser = await puppeteer.connect({
     ...browserAdapter.connectOptions,
     defaultViewport: { width: 0, height: 0 },
   });
-  const page = await browser.newPage();
+  let page = await browser.newPage();
 
   browser.on('disconnected', () => options.onExit?.())
 
   const loadPage = async (url: string) => {
+    if (page.isClosed()) {
+      page = await browser.newPage();
+    }
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => {
       const win = window as any;
@@ -34,12 +41,13 @@ export const makeBrowserManager = async (
   })
 
   const close = async () => {
-    await browser.disconnect();
+    // await browser.disconnect();
+    await browser.close();
   }
 
   return {
     browser,
-    page,
+    getPage: () => page,
     loadPage,
     createWindowProxy,
     close,
@@ -57,9 +65,8 @@ export const makeBrowserRepl = async (options: { onExit?: () => void } = {}) => 
   const stateDirPath = path.join(process.env['HOME'] ?? '', '.local/state/web-repl')
   await mkdir(stateDirPath, { recursive: true })
 
-  replServer.setupHistory(path.join(stateDirPath, 'history'), (err, _) => {
-    console.log(err);
-  })
+  // Dont care if the history setup failed
+  replServer.setupHistory(path.join(stateDirPath, 'history'), (_err, _) => { })
 
   replServer.on('exit', () => options.onExit?.())
   replServer.defineCommand('q', () => options.onExit?.())
