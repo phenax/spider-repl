@@ -3,10 +3,10 @@
 set -eu
 
 BUILD_DIR=./build
-ENTRY_POINT=./bin/web-repl.ts
-BUNDLE_OUT="$BUILD_DIR/web-repl.js"
-BINARY_OUT="$BUILD_DIR/web-repl"
-BLOB_OUT="$BUILD_DIR/web-repl.blob"
+ENTRY_POINT=./bin/spider-repl.ts
+BUNDLE_OUT="$BUILD_DIR/spider-repl.js"
+BINARY_OUT="$BUILD_DIR/spider-repl"
+BLOB_OUT="$BUILD_DIR/spider-repl.blob"
 
 bundle() {
   echo "Bundling..."

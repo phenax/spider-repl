@@ -3,35 +3,35 @@ import type { ConnectOptions } from "puppeteer-core";
 
 type LaunchOpts = { onExit?: () => void }
 
-type BrowserAdapterOptions = { command?: string; args?: string[]; port?: number }
+type BrowserAdapterOptions = { command: string; args?: () => string[]; port?: number }
 
 export abstract class BrowserAdapter {
   abstract name: string;
   abstract connectOptions: ConnectOptions;
 
-  command: string = '';
-  args: string[] = [];
+  command: string;
+  args: (() => string[]) | undefined = undefined;
   port: number = 9222;
 
-  constructor({ port, args, command }: BrowserAdapterOptions = {}) {
+  constructor({ port, args, command }: BrowserAdapterOptions) {
+    this.command = command;
     if (port) this.port = port;
-    if (command) this.command = command;
     if (args) this.args = args;
   }
 
   async launch(options: LaunchOpts = {}) {
-    const proc = spawn(this.command, [`--remote-debugging-port=${this.port}`, ...this.args], { stdio: 'pipe', detached: false })
+    const args = this.args ? this.args.apply(this) : [`--remote-debugging-port=${this.port}`]
+    const proc = spawn(this.command, args, { stdio: 'pipe', detached: false })
     proc.once('exit', () => options?.onExit?.())
     await waitForHttp200(`http://127.0.0.1:${this.port}/`)
   }
 }
 
-export class FirefoxBrowserAdapter extends BrowserAdapter {
-  name = 'firefox';
+export class WebDriverBiDiBrowserAdapter extends BrowserAdapter {
+  name = 'webdriverbidi';
 
-  constructor(options?: BrowserAdapterOptions) {
+  constructor(options: BrowserAdapterOptions) {
     super(options);
-    this.command = this.command || 'firefox';
   }
 
   get connectOptions(): ConnectOptions {
@@ -42,12 +42,11 @@ export class FirefoxBrowserAdapter extends BrowserAdapter {
   }
 }
 
-export class ChromiumBrowserAdapter extends BrowserAdapter {
-  name = 'chromium';
+export class DevtoolsProtocolBrowserAdapter extends BrowserAdapter {
+  name = 'cdp';
 
-  constructor(options?: BrowserAdapterOptions) {
+  constructor(options: BrowserAdapterOptions) {
     super(options);
-    this.command = this.command || 'chromium';
   }
 
   get connectOptions(): ConnectOptions {

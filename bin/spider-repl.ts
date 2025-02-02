@@ -1,12 +1,7 @@
 #!/usr/bin/env node
 
 import { makeBrowserManager, makeBrowserRepl } from '../src/index.ts'
-import { ChromiumBrowserAdapter, FirefoxBrowserAdapter } from '../src/browserAdapter.ts'
-
-const browsers = {
-  brave: new ChromiumBrowserAdapter({ command: 'brave' }),
-  firefox: new FirefoxBrowserAdapter,
-}
+import { browsers } from '../src/browsers.ts'
 
 const browserAdapter = browsers.firefox
 
@@ -23,12 +18,9 @@ const main = async () => {
     })
 
     Object.defineProperties(ctx, {
-      page: {
-        get: () => browserManager.getPage(),
-      },
-      load: {
-        get: () => browserManager.loadPage,
-      },
+      browser: { get: () => browserManager.browser },
+      page: { get: () => browserManager.getPage() },
+      load: { get: () => browserManager.loadPage },
     })
 
     return ctx

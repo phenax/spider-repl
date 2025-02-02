@@ -1,5 +1,5 @@
 {
-  "main": "build/web-repl.js",
-  "output": "build/web-repl.blob",
+  "main": "build/spider-repl.js",
+  "output": "build/spider-repl.blob",
   "disableExperimentalSEAWarning": true
 }

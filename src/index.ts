@@ -62,7 +62,7 @@ export const makeBrowserRepl = async (options: { onExit?: () => void } = {}) => 
     breakEvalOnSigint: true,
   })
 
-  const stateDirPath = path.join(process.env['HOME'] ?? '', '.local/state/web-repl')
+  const stateDirPath = path.join(process.env['HOME'] ?? '', '.local/state/spider-repl')
   await mkdir(stateDirPath, { recursive: true })
 
   // Dont care if the history setup failed
