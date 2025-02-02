@@ -1,0 +1,5 @@
+{
+  "main": "build/web-repl.js",
+  "output": "build/web-repl.blob",
+  "disableExperimentalSEAWarning": true
+}

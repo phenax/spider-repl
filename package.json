@@ -2,11 +2,18 @@
   "name": "web-repl",
   "main": "bin/web-repl.ts",
   "type": "module",
+  "engines": {
+    "node": ">= 22.6"
+  },
   "scripts": {
-    "start": "node ."
+    "start": "node .",
+    "bundle": "./build.sh bundle",
+    "build": "./build.sh build"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "esbuild": "^0.24.2",
+    "postject": "^1.0.0-alpha.6"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
