@@ -1,7 +1,10 @@
 {
   "name": "web-repl",
-  "module": "index.ts",
+  "main": "bin/web-repl.ts",
   "type": "module",
+  "scripts": {
+    "start": "node ."
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },

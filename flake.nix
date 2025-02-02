@@ -16,8 +16,8 @@
             nodePackages.typescript-language-server
           ];
 
-          # PUPPETEER_EXECUTABLE_PATH_chromium = "${pkgs.ungoogled-chromium}/bin/chromium";
-          PUPPETEER_EXECUTABLE_PATH_chromium = "${pkgs.brave}/bin/brave";
+          PUPPETEER_EXECUTABLE_PATH_chromium = "${pkgs.ungoogled-chromium}/bin/chromium";
+          # PUPPETEER_EXECUTABLE_PATH_chromium = "${pkgs.brave}/bin/brave";
           PUPPETEER_EXECUTABLE_PATH_firefox = "${pkgs.firefox}/bin/firefox";
         };
     in
