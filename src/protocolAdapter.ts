@@ -3,14 +3,13 @@ import type { ConnectOptions } from "puppeteer-core";
 
 type LaunchOpts = { onExit?: () => void }
 
-type BrowserAdapterOptions = { command: string; args?: () => string[]; port?: number }
+type BrowserAdapterOptions = { command: string; args?: (args: string[]) => string[]; port?: number }
 
-export abstract class BrowserAdapter {
-  abstract name: string;
+export abstract class ProtocolAdapter {
   abstract connectOptions: ConnectOptions;
 
   command: string;
-  args: (() => string[]) | undefined = undefined;
+  args: ((args: string[]) => string[]) | undefined = undefined;
   port: number = 9222;
 
   constructor({ port, args, command }: BrowserAdapterOptions) {
@@ -20,16 +19,15 @@ export abstract class BrowserAdapter {
   }
 
   async launch(options: LaunchOpts = {}) {
-    const args = this.args ? this.args.apply(this) : [`--remote-debugging-port=${this.port}`]
+    let args = [`--remote-debugging-port=${this.port}`]
+    args = this.args ? this.args.apply(this, [args]) : args
     const proc = spawn(this.command, args, { stdio: 'pipe', detached: false })
     proc.once('exit', () => options?.onExit?.())
     await waitForHttp200(`http://127.0.0.1:${this.port}/`)
   }
 }
 
-export class WebDriverBiDiBrowserAdapter extends BrowserAdapter {
-  name = 'webdriverbidi';
-
+export class WebDriverBiDiProtocolAdapter extends ProtocolAdapter {
   constructor(options: BrowserAdapterOptions) {
     super(options);
   }
@@ -42,9 +40,7 @@ export class WebDriverBiDiBrowserAdapter extends BrowserAdapter {
   }
 }
 
-export class DevtoolsProtocolBrowserAdapter extends BrowserAdapter {
-  name = 'cdp';
-
+export class DevtoolsProtocolAdapter extends ProtocolAdapter {
   constructor(options: BrowserAdapterOptions) {
     super(options);
   }

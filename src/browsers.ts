@@ -1,13 +1,25 @@
-import { DevtoolsProtocolBrowserAdapter, WebDriverBiDiBrowserAdapter } from './browserAdapter.ts';
+import { DevtoolsProtocolAdapter, WebDriverBiDiProtocolAdapter } from './protocolAdapter.ts';
 
-export const browsers = {
-  brave: new DevtoolsProtocolBrowserAdapter({ command: 'brave' }),
-  chrome: new DevtoolsProtocolBrowserAdapter({ command: 'chrome' }),
-  chromium: new DevtoolsProtocolBrowserAdapter({ command: 'chromium' }),
-  firefox: new WebDriverBiDiBrowserAdapter({ command: 'firefox' }),
-}
+export const browsers = () => ({
+  brave: new DevtoolsProtocolAdapter({
+    command: 'brave',
+    args: args => [...args, '--user-data-dir=/home/imsohexy/.local/state/spider-repl/brave'],
+  }),
+  chrome: new DevtoolsProtocolAdapter({
+    command: 'chrome',
+    args: args => [...args, '--user-data-dir=/home/imsohexy/.local/state/spider-repl/chrome'],
+  }),
+  chromium: new DevtoolsProtocolAdapter({
+    command: 'chromium',
+    args: args => [...args, '--user-data-dir=/home/imsohexy/.local/state/spider-repl/chromium'],
+  }),
+  firefox: new WebDriverBiDiProtocolAdapter({
+    command: 'firefox',
+    args: args => [...args, '--new-instance', '-P', 'spider-repl', '--profile', '/home/imsohexy/.local/state/spider-repl/firefox'],
+  }),
+})
 
 export const protocols = {
-  cdp: DevtoolsProtocolBrowserAdapter,
-  webdriver: WebDriverBiDiBrowserAdapter,
+  cdp: DevtoolsProtocolAdapter,
+  webdriverbidi: WebDriverBiDiProtocolAdapter,
 }

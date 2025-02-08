@@ -1,78 +1,37 @@
-import puppeteer from 'puppeteer-core';
-import repl from 'node:repl';
-import path from 'node:path';
-import { type BrowserAdapter } from './browserAdapter.ts';
-import { mkdir } from 'node:fs/promises';
+import { browsers } from '../src/browsers.ts'
+import { makeBrowserManager } from './browserManager.ts'
+import { makeBrowserRepl } from './repl.ts'
 
-export const makeBrowserManager = async (
-  browserAdapter: BrowserAdapter,
-  options: { onExit?: () => void } = {}
-) => {
-  await browserAdapter.launch({
-    onExit: () => options.onExit?.(),
-  });
+// TODO: Create empty dir for browser profiles
+export const initApp = async () => {
+  const browserAdapter = browsers().firefox
 
-  const browser = await puppeteer.connect({
-    ...browserAdapter.connectOptions,
-    defaultViewport: { width: 0, height: 0 },
-  });
-  let page = await browser.newPage();
+  const browserManager = await makeBrowserManager(browserAdapter, {
+    onExit: () => quit(),
+  })
 
-  browser.on('disconnected', () => options.onExit?.())
+  const repl = await makeBrowserRepl({ onExit: () => quit() })
 
-  const loadPage = async (url: string) => {
-    if (page.isClosed()) {
-      page = await browser.newPage();
-    }
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
-    await page.evaluate(() => {
-      const win = window as any;
-      win.$expose = (name: string, obj: any) => {
-        win[name] ||= {};
-        Object.assign(win[name], obj)
-      };
+  repl.attachContext(ctx => {
+    Object.assign(ctx, {
+      $: browserManager.createWindowProxy(),
     })
-  }
 
-  const createWindowProxy = (chain: (string | symbol | number)[] = []) => new Proxy(() => { }, {
-    get: (_, name) => createWindowProxy([...chain, name]),
-    apply: () => page.evaluate((ch) =>
-      ch.reduce<any>((obj, name) => obj?.[name], window), chain),
+    Object.defineProperties(ctx, {
+      browser: { get: () => browserManager.browser },
+      page: { get: () => browserManager.getPage() },
+      load: { get: () => browserManager.loadPage },
+      screenshot: { get: () => browserManager.screenshot },
+    })
+
+    return ctx
   })
 
-  const close = async () => {
-    // await browser.disconnect();
-    await browser.close();
-  }
-
-  return {
-    browser,
-    getPage: () => page,
-    loadPage,
-    createWindowProxy,
-    close,
-  }
-}
-
-export const makeBrowserRepl = async (options: { onExit?: () => void } = {}) => {
-  const replServer = repl.start({
-    prompt: 'web > ',
-    preview: true,
-    useGlobal: false,
-    breakEvalOnSigint: true,
-  })
-
-  const stateDirPath = path.join(process.env['HOME'] ?? '', '.local/state/spider-repl')
-  await mkdir(stateDirPath, { recursive: true })
-
-  // Dont care if the history setup failed
-  replServer.setupHistory(path.join(stateDirPath, 'history'), (_err, _) => { })
-
-  replServer.on('exit', () => options.onExit?.())
-  replServer.defineCommand('q', () => options.onExit?.())
-
-  return {
-    close: () => replServer.close(),
-    attachContext: (withCtx: (c: Record<any, any>) => Record<any, any>) => withCtx(replServer.context),
+  const quit = async () => {
+    console.log('killing myself...')
+    await browserManager.close()
+    repl.close()
+    console.log('bye bye')
+    process.exit(0)
   }
 }
