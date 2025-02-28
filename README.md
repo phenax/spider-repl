@@ -19,7 +19,7 @@ Or run it directly with `npx spider-repl`
 
 ## Usage
 
-#### Start the repl
+### Start the repl
 Running `spider-repl` will open a new browser window (on your existing session) and start the repl.
 ```sh
 spider-repl
@@ -28,7 +28,7 @@ spider-repl
 By default this will use chromium.
 
 
-#### Use a different browser
+### Use a different browser
 ```sh
 # Supports chrome, chromium, brave, firefox
 spider-repl -b chrome
@@ -45,7 +45,7 @@ spider-repl --protocol cdp --port 9999
 ```
 
 
-#### Load a page
+### Load a page
 Directly load a page
 ```sh
 spider-repl 'https://example.com'
@@ -57,7 +57,7 @@ load('https://example.com')
 ```
 
 
-#### Do all the puppeteering
+### Do all the puppeteering
 Puppeteer apis are accessible via `browser` & `page`
 ```js
 page.locate('button[data-testid="foobar"]').click()
@@ -66,7 +66,7 @@ page.evaluate('someJSFunctionInsideTheWebpage()')
 ```
 
 
-#### Interact with apps in development
+### Interact with apps in development
 
 In your app (example using react)
 ```js

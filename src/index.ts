@@ -5,15 +5,15 @@ import { makeBrowserRepl } from './repl.ts'
 import { parseArgs } from './cli.ts'
 
 export const initApp = async () => {
-  const options = await parseArgs();
+  const options = await parseArgs()
   const browserAdapter = options.protocol
     ? makeCustomProtocolAdapter({
-      protocol: options.protocol,
-      cmd: options.browserCmd,
-      port: options.port,
-      host: options.host,
-    })
-    : browsers()[options.browser];
+        protocol: options.protocol,
+        cmd: options.browserCmd,
+        port: options.port,
+        host: options.host,
+      })
+    : browsers()[options.browser]
 
   const browserManager = await makeBrowserManager(browserAdapter, {
     onExit: () => quit(),
@@ -21,7 +21,7 @@ export const initApp = async () => {
 
   const repl = await makeBrowserRepl({ onExit: () => quit() })
 
-  repl.attachContext(ctx => {
+  repl.attachContext((ctx) => {
     Object.assign(ctx, {
       $: browserManager.createWindowProxy(),
     })

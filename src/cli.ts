@@ -1,14 +1,19 @@
-import { protocolNames, browserNames, type Browser, type Protocol } from './browsers.ts';
 import * as cmd from 'cmd-ts'
 import * as cmdUrl from 'cmd-ts/dist/cjs/batteries/url.js'
+import {
+  type Browser,
+  type Protocol,
+  browserNames,
+  protocolNames,
+} from './browsers.ts'
 
 type ReplOptions = {
-  browser: Browser;
-  protocol?: Protocol;
-  browserCmd?: string;
-  host?: string;
-  port?: number;
-  startUrl?: URL;
+  browser: Browser
+  protocol?: Protocol
+  browserCmd?: string
+  host?: string
+  port?: number
+  startUrl?: URL
 }
 
 const cliArgs = {
@@ -47,14 +52,15 @@ const cliArgs = {
   }),
 } as const
 
-export const parseArgs = () => new Promise<ReplOptions>(async (resolve, _reject) => {
-  const cli = cmd.command({
-    name: 'spider-repl',
-    version: '0.0.0',
-    description: 'Open up a repl to browser via puppeteer',
-    args: cliArgs,
-    handler: resolve,
-  })
+export const parseArgs = () =>
+  new Promise<ReplOptions>((resolve, reject) => {
+    const cli = cmd.command({
+      name: 'spider-repl',
+      version: '0.0.0',
+      description: 'Open up a repl to browser via puppeteer',
+      args: cliArgs,
+      handler: resolve,
+    })
 
-  await cmd.run(cmd.binary(cli), process.argv)
-});
+    cmd.run(cmd.binary(cli), process.argv).catch(reject)
+  })
