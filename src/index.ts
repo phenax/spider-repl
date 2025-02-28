@@ -2,9 +2,12 @@ import { browsers } from '../src/browsers.ts'
 import { makeBrowserManager } from './browserManager.ts'
 import { makeBrowserRepl } from './repl.ts'
 
+import { parseArgs } from './cli.ts'
+
 // TODO: Create empty dir for browser profiles
 export const initApp = async () => {
-  const browserAdapter = browsers().firefox
+  const options = await parseArgs();
+  const browserAdapter = browsers()[options.browser];
 
   const browserManager = await makeBrowserManager(browserAdapter, {
     onExit: () => quit(),

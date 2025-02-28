@@ -1,5 +1,9 @@
 import { DevtoolsProtocolAdapter, WebDriverBiDiProtocolAdapter } from './protocolAdapter.ts';
 
+export const browserNames = ['brave', 'chrome', 'chromium', 'firefox'] as const
+
+export type Browser = (typeof browserNames)[number];
+
 export const browsers = () => ({
   brave: new DevtoolsProtocolAdapter({
     command: 'brave',
@@ -23,3 +27,7 @@ export const protocols = {
   cdp: DevtoolsProtocolAdapter,
   webdriverbidi: WebDriverBiDiProtocolAdapter,
 }
+
+export type Protocol = keyof typeof protocols
+
+export const protocolNames = Object.keys(protocols) as Protocol[]

@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "description": "A repl to interact with web browsers during development",
   "main": "build/spider-repl.js",
+  "type": "module",
   "license": "GPL-3.0",
   "author": "Akshay Nair <phenax5@gmail.com>",
   "engines": {
@@ -28,6 +29,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "cmd-ts": "^0.13.0",
     "puppeteer-core": "^24.1.1"
   }
 }
