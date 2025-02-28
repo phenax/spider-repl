@@ -10,24 +10,28 @@ type BrowserAdapterOptions = {
   args?: (args: string[]) => string[];
   port?: number;
   host?: string;
+  beforeStart?: () => void | PromiseLike<void>;
 }
 
 export abstract class ProtocolAdapter {
   abstract connectOptions: ConnectOptions;
 
-  command: string;
-  args: ((args: string[]) => string[]) | undefined = undefined;
-  host: string = '127.0.0.1';
-  port: number = 9222;
+  command: BrowserAdapterOptions['command'];
+  args: BrowserAdapterOptions['args'] = undefined;
+  host: BrowserAdapterOptions['host'] = '127.0.0.1';
+  port: BrowserAdapterOptions['port'] = 9222;
+  beforeStart: BrowserAdapterOptions['beforeStart'];
 
-  constructor({ host, port, args, command }: BrowserAdapterOptions) {
+  constructor({ host, port, args, command, beforeStart }: BrowserAdapterOptions) {
     this.command = command;
     if (host !== undefined) this.host = host;
     if (port !== undefined) this.port = port;
     if (args !== undefined) this.args = args;
+    if (beforeStart !== undefined) this.beforeStart = beforeStart;
   }
 
   async launch(options: LaunchOpts = {}) {
+    await this.beforeStart?.();
     let args = [`--remote-debugging-port=${this.port}`]
     args = this.args ? this.args.apply(this, [args]) : args
     const proc = spawn(this.command, args, { stdio: 'pipe', detached: false })

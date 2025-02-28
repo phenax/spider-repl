@@ -66,7 +66,7 @@ page.evaluate('someJSFunctionInsideTheWebpage()')
 ```
 
 
-#### Interact with apps in development (WIP)
+#### Interact with apps in development
 
 In your app (example using react)
 ```js

@@ -4,7 +4,6 @@ import { makeBrowserRepl } from './repl.ts'
 
 import { parseArgs } from './cli.ts'
 
-// TODO: Create empty dir for browser profiles
 export const initApp = async () => {
   const options = await parseArgs();
   const browserAdapter = options.protocol
