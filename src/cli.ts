@@ -5,6 +5,8 @@ type ReplOptions = {
   browser: Browser,
   protocol?: Protocol,
   browserCmd?: string,
+  host?: string,
+  port?: number,
 }
 
 export const parseArgs = () => new Promise<ReplOptions>(async (resolve, _reject) => {
@@ -29,7 +31,17 @@ export const parseArgs = () => new Promise<ReplOptions>(async (resolve, _reject)
       browserCmd: cmd.option({
         type: cmd.optional(cmd.string),
         long: 'browser-cmd',
-        description: 'Command to run browser (Overrides --browser option)',
+        description: 'Command to run browser (Only used with --protocol)',
+      }),
+      port: cmd.option({
+        type: cmd.optional(cmd.number),
+        long: 'port',
+        description: 'Port number for remote debugging (Only used with --protocol)',
+      }),
+      host: cmd.option({
+        type: cmd.optional(cmd.string),
+        long: 'host',
+        description: 'Hostname for remote debugging (Only used with --protocol)',
       }),
     },
     handler: resolve,

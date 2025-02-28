@@ -1,4 +1,4 @@
-import { browsers, makeBrowser } from '../src/browsers.ts'
+import { browsers, makeCustomProtocolAdapter } from '../src/browsers.ts'
 import { makeBrowserManager } from './browserManager.ts'
 import { makeBrowserRepl } from './repl.ts'
 
@@ -8,7 +8,12 @@ import { parseArgs } from './cli.ts'
 export const initApp = async () => {
   const options = await parseArgs();
   const browserAdapter = options.protocol
-    ? makeBrowser({ protocol: options.protocol, cmd: options.browserCmd ?? 'chromium' })
+    ? makeCustomProtocolAdapter({
+      protocol: options.protocol,
+      cmd: options.browserCmd,
+      port: options.port,
+      host: options.host,
+    })
     : browsers()[options.browser];
 
   const browserManager = await makeBrowserManager(browserAdapter, {

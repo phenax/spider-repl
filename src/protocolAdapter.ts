@@ -1,21 +1,30 @@
 import { spawn } from "node:child_process";
 import type { ConnectOptions } from "puppeteer-core";
 
+const RETRY_INTERVAL = 1_300 // ms
+
 type LaunchOpts = { onExit?: () => void }
 
-type BrowserAdapterOptions = { command: string; args?: (args: string[]) => string[]; port?: number }
+type BrowserAdapterOptions = {
+  command: string;
+  args?: (args: string[]) => string[];
+  port?: number;
+  host?: string;
+}
 
 export abstract class ProtocolAdapter {
   abstract connectOptions: ConnectOptions;
 
   command: string;
   args: ((args: string[]) => string[]) | undefined = undefined;
+  host: string = '127.0.0.1';
   port: number = 9222;
 
-  constructor({ port, args, command }: BrowserAdapterOptions) {
+  constructor({ host, port, args, command }: BrowserAdapterOptions) {
     this.command = command;
-    if (port) this.port = port;
-    if (args) this.args = args;
+    if (host !== undefined) this.host = host;
+    if (port !== undefined) this.port = port;
+    if (args !== undefined) this.args = args;
   }
 
   async launch(options: LaunchOpts = {}) {
@@ -24,7 +33,7 @@ export abstract class ProtocolAdapter {
     console.log(args)
     const proc = spawn(this.command, args, { stdio: 'pipe', detached: false })
     proc.once('exit', () => options?.onExit?.())
-    await waitForHttp200(`http://127.0.0.1:${this.port}/`)
+    await waitForHttp200(`http://${this.host}:${this.port}/`)
   }
 }
 
@@ -35,7 +44,7 @@ export class WebDriverBiDiProtocolAdapter extends ProtocolAdapter {
 
   get connectOptions(): ConnectOptions {
     return {
-      browserWSEndpoint: `ws://127.0.0.1:${this.port}/session`,
+      browserWSEndpoint: `ws://${this.host}:${this.port}/session`,
       protocol: 'webDriverBiDi',
     }
   }
@@ -61,7 +70,7 @@ const waitForHttp200 = async (url: string) => {
     try {
       const resp = await fetch(url)
       if (resp.status === 200) return;
-      await new Promise(res => setTimeout(res, 1300));
+      await new Promise(res => setTimeout(res, RETRY_INTERVAL));
     } catch (e) { }
   }
 }

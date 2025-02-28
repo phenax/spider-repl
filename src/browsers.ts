@@ -32,9 +32,18 @@ export type Protocol = keyof typeof protocols
 
 export const protocolNames = Object.keys(protocols) as Protocol[]
 
-export const makeBrowser = ({ cmd, protocol }: { cmd: string, protocol: Protocol }) => {
+export const makeCustomProtocolAdapter = (
+  { cmd, protocol, host, port }: {
+    protocol: Protocol;
+    cmd?: string;
+    host?: string;
+    port?: number;
+  }
+) => {
   return new protocols[protocol]({
     command: 'sh',
-    args: args => ['-c', `${cmd} ${args.join(' ')}`],
+    args: args => ['-c', cmd ? `${cmd} ${args.join(' ')}` : 'tail -f /dev/null'],
+    host,
+    port,
   })
 }
