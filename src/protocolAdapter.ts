@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import type { ConnectOptions } from "puppeteer-core";
 
-const RETRY_INTERVAL = 1_300 // ms
+const RETRY_INTERVAL = 1300 // ms
 
 type LaunchOpts = { onExit?: () => void }
 
@@ -30,7 +30,6 @@ export abstract class ProtocolAdapter {
   async launch(options: LaunchOpts = {}) {
     let args = [`--remote-debugging-port=${this.port}`]
     args = this.args ? this.args.apply(this, [args]) : args
-    console.log(args)
     const proc = spawn(this.command, args, { stdio: 'pipe', detached: false })
     proc.once('exit', () => options?.onExit?.())
     await waitForHttp200(`http://${this.host}:${this.port}/`)

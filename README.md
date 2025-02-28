@@ -28,7 +28,7 @@ spider-repl
 By default this will use chromium.
 
 
-#### Use a different browser (WIP)
+#### Use a different browser
 ```sh
 # Supports chrome, chromium, brave, firefox
 spider-repl -b chrome
@@ -36,12 +36,17 @@ spider-repl -b chrome
 
 For a custom browser, you can specify the command and the dev tools protocol used. (May or may not work)
 ```sh
-spider-repl --browser-command browser-name-or-path --protocol cdp
+spider-repl --protocol cdp --browser-cmd 'some-browser --remote-debugging-port=9999' --port 9999
+```
+
+Or if the browser instance is already running with a debugger on port `9999`
+```sh
+spider-repl --protocol cdp --port 9999
 ```
 
 
 #### Load a page
-Directly load a page (WIP)
+Directly load a page
 ```sh
 spider-repl 'https://example.com'
 ```

@@ -37,6 +37,9 @@ export const initApp = async () => {
     return ctx
   })
 
+  if (options.startUrl)
+    browserManager.loadPage(options.startUrl.toString()).catch(console.error)
+
   const quit = async () => {
     console.log('killing myself...')
     await browserManager.close()
