@@ -1,10 +1,10 @@
-import { DevtoolsProtocolAdapter, WebDriverBiDiProtocolAdapter } from './protocolAdapter.ts';
+import { DevtoolsProtocolAdapter, ProtocolAdapter, WebDriverBiDiProtocolAdapter } from './protocolAdapter.ts';
 
 export const browserNames = ['brave', 'chrome', 'chromium', 'firefox'] as const
 
 export type Browser = (typeof browserNames)[number];
 
-export const browsers = () => ({
+export const browsers = (): Record<Browser, ProtocolAdapter> => ({
   brave: new DevtoolsProtocolAdapter({
     command: 'brave',
     args: args => [...args, '--user-data-dir=/home/imsohexy/.local/state/spider-repl/brave'],
@@ -31,3 +31,10 @@ export const protocols = {
 export type Protocol = keyof typeof protocols
 
 export const protocolNames = Object.keys(protocols) as Protocol[]
+
+export const makeBrowser = ({ cmd, protocol }: { cmd: string, protocol: Protocol }) => {
+  return new protocols[protocol]({
+    command: 'sh',
+    args: args => ['-c', `${cmd} ${args.join(' ')}`],
+  })
+}

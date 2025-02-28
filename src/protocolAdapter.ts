@@ -21,6 +21,7 @@ export abstract class ProtocolAdapter {
   async launch(options: LaunchOpts = {}) {
     let args = [`--remote-debugging-port=${this.port}`]
     args = this.args ? this.args.apply(this, [args]) : args
+    console.log(args)
     const proc = spawn(this.command, args, { stdio: 'pipe', detached: false })
     proc.once('exit', () => options?.onExit?.())
     await waitForHttp200(`http://127.0.0.1:${this.port}/`)

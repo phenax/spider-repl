@@ -1,4 +1,4 @@
-import { browsers } from '../src/browsers.ts'
+import { browsers, makeBrowser } from '../src/browsers.ts'
 import { makeBrowserManager } from './browserManager.ts'
 import { makeBrowserRepl } from './repl.ts'
 
@@ -7,7 +7,9 @@ import { parseArgs } from './cli.ts'
 // TODO: Create empty dir for browser profiles
 export const initApp = async () => {
   const options = await parseArgs();
-  const browserAdapter = browsers()[options.browser];
+  const browserAdapter = options.protocol
+    ? makeBrowser({ protocol: options.protocol, cmd: options.browserCmd ?? 'chromium' })
+    : browsers()[options.browser];
 
   const browserManager = await makeBrowserManager(browserAdapter, {
     onExit: () => quit(),

@@ -3,7 +3,8 @@ import * as cmd from 'cmd-ts'
 
 type ReplOptions = {
   browser: Browser,
-  protocol: Protocol,
+  protocol?: Protocol,
+  browserCmd?: string,
 }
 
 export const parseArgs = () => new Promise<ReplOptions>(async (resolve, _reject) => {
@@ -16,16 +17,19 @@ export const parseArgs = () => new Promise<ReplOptions>(async (resolve, _reject)
         type: cmd.oneOf(browserNames),
         long: 'browser',
         short: 'b',
-        description: 'Browser to use',
+        description: `Name of the browser to use. Supports: ${browserNames.join(', ')}`,
         defaultValue: () => 'chromium' as const,
         defaultValueIsSerializable: true,
       }),
       protocol: cmd.option({
-        type: cmd.oneOf(protocolNames),
+        type: cmd.optional(cmd.oneOf(protocolNames)),
         long: 'protocol',
-        description: 'Protocol to use for ',
-        defaultValue: () => 'cdp' as const,
-        defaultValueIsSerializable: true,
+        description: `Debugging protocol to use to connect with browser. Supports ${protocolNames.join(', ')} (Overrides --browser option)`,
+      }),
+      browserCmd: cmd.option({
+        type: cmd.optional(cmd.string),
+        long: 'browser-cmd',
+        description: 'Command to run browser (Overrides --browser option)',
       }),
     },
     handler: resolve,
