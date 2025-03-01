@@ -1,11 +1,11 @@
 {
   "name": "spider-repl",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A repl to interact with web browsers during development",
   "main": "build/spider-repl.js",
-  "type": "module",
   "license": "GPL-3.0",
   "author": "Akshay Nair <phenax5@gmail.com>",
+  "repository": "github:phenax/spider-repl",
   "engines": {
     "node": ">= 22.6"
   },
@@ -17,14 +17,14 @@
     "start": "node ./bin/spider-repl.ts",
     "build": "./build.sh bundle",
     "build:exe": "./build.sh build",
-    "prepare": "npm run build"
+    "format": "biome check --write",
+    "prepare": "npm run build:exe"
   },
+  "keywords": ["repl", "puppeteer", "browser", "firefox", "chrome"],
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "esbuild": "^0.24.2",
-    "postject": "^1.0.0-alpha.6"
-  },
-  "peerDependencies": {
+    "postject": "^1.0.0-alpha.6",
     "typescript": "^5.0.0"
   },
   "dependencies": {

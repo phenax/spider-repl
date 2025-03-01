@@ -15,17 +15,15 @@ export const makeBrowserManager = async (
   })
   let page = await browser.newPage()
 
+  // Close all tabs except for the current one
   const allPages = await browser.pages()
-  if (allPages.length > 1) {
-    allPages.forEach((p) => page !== p && p.close())
-  }
+  if (allPages.length > 1) allPages.forEach((p) => page !== p && p.close())
 
   browser.on('disconnected', () => options.onExit?.())
 
   const loadPage = async (url: string) => {
-    if (page.isClosed()) {
-      page = await browser.newPage()
-    }
+    if (page.isClosed()) page = await browser.newPage()
+
     await page.goto(url, { waitUntil: 'domcontentloaded' })
     await page.evaluate(() => {
       const win = window as any
@@ -36,14 +34,27 @@ export const makeBrowserManager = async (
     })
   }
 
-  const createWindowProxy = (chain: (string | symbol | number)[] = []) =>
-    new Proxy(() => {}, {
-      get: (_, name) => createWindowProxy([...chain, name]),
-      apply: () =>
-        page.evaluate(
-          (ch) => ch.reduce<any>((obj, name) => obj?.[name], window),
-          chain,
-        ),
+  type Prop =
+    | { type: 'get'; name: string | symbol | number }
+    | { type: 'call'; args: any[] }
+  const createWindowProxy = (chain: Prop[] = []): any =>
+    new Proxy(() => { }, {
+      get: (_, name) => createWindowProxy([...chain, { type: 'get', name }]),
+      apply: (_f, _this, args) => {
+        const lastIndex = chain.findLastIndex((val) => val.type === 'get')
+        const last = chain[lastIndex]
+        if (last?.type === 'get' && last.name !== 'wait')
+          return createWindowProxy([...chain, { type: 'call', args }])
+
+        return page.evaluate(
+          (ch) =>
+            ch.reduce((obj, prop) => {
+              if (prop.type === 'get') return obj?.[prop.name]
+              return obj(...prop.args)
+            }, window as any),
+          chain.slice(0, lastIndex),
+        )
+      },
     })
 
   const screenshotView = (path: string) => page.screenshot({ path })

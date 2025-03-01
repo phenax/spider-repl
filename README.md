@@ -1,15 +1,28 @@
 # spider-repl
-A repl to interact with web browsers during development via puppeteer
+A repl to interact with web browsers during development via puppeteer.
 
-> Supports any browser that supports devtools protocol or webdriver bidi: chrome, chromium, brave, firefox, etc.
+
+## Features
+- Repl/live-environment workflow
+- Screenshots
+- Record videos
+- Interact with page programmatically
+- Run javascript on the page
+- Use any browser
+- ...everything puppeteer can do
 
 
 ## Motivations
-None of your business.
+It's an experiment. I want to see how the repl workflow to interact with browsers feel and what can be improved.
+
+
+## Requirements
+- nodejs >= 22.6
+- Any browser that supports devtools protocol or webdriver bidi: chrome, chromium, brave, firefox, etc.
 
 
 ## Install
-
+Install it globally via npm
 ```js
 npm i -g spider-repl
 ```
@@ -31,7 +44,7 @@ By default this will use chromium.
 ### Use a different browser
 ```sh
 # Supports chrome, chromium, brave, firefox
-spider-repl -b chrome
+spider-repl -b firefox
 ```
 
 For a custom browser, you can specify the command and the dev tools protocol used. (May or may not work)
@@ -39,7 +52,7 @@ For a custom browser, you can specify the command and the dev tools protocol use
 spider-repl --protocol cdp --browser-cmd 'some-browser --remote-debugging-port=9999' --port 9999
 ```
 
-Or if the browser instance is already running with a debugger on port `9999`
+Or if the browser instance is already running with a debugger on port `9999`, you can connect to it using...
 ```sh
 spider-repl --protocol cdp --port 9999
 ```
